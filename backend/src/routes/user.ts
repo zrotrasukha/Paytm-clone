@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import * as z from "zod";
 import jwt from "jsonwebtoken";
-import { User } from "../lib/schema";
+import { Account, User } from "../lib/schema";
 import { jwt_secret } from "../config.js";
 import { authCheck } from "../middleware";
 import { AuthenticatedRequest } from "../types";
@@ -25,19 +25,27 @@ router.post("/signup", async (req: Request, res: Response) => {
       return res.status(400).send({ error: "Incorrect inputs" });
     }
     const existingUser = await User.findOne({ email: signupUserBody.email });
+
     if (existingUser) {
       return res
         .status(401)
         .send({ error: "Email already taken / Incorrect inputs" });
     }
+    const randomAccountBalance = Math.floor(Math.random() * 10000 + 1);
 
+    //use creation:
     const newUser = await User.create(signupUserBody);
     const userId = newUser._id;
 
+    //account creation
+    await Account.create({ userId, balance: randomAccountBalance });
+
     const token = jwt.sign({ userId }, jwt_secret!);
-    return res
-      .status(200)
-      .send({ message: "User created successfully", token });
+
+    return res.status(200).send({
+      message: "User created successfully",
+      token,
+    });
   } catch (error) {
     return res
       .status(500)
