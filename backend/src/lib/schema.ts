@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Mongoose } from "mongoose";
 const { Schema, model } = mongoose;
 
 const userSchema = new Schema({
@@ -22,6 +22,22 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  token: {
+    type: String,
+  },
+});
+
+const accountSchema = new Schema({
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  balance: {
+    type: Number,
+    required: true,
+  },
 });
 
 export const User = model("User", userSchema);
+export const Account = model("Account", accountSchema);
