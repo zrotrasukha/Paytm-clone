@@ -9,7 +9,7 @@ app.use(express.json());
 const PORT = 3000;
 
 app.use("/api/v1", rootRouter);
-
+app.use""
 app.listen(PORT, () => {
   console.log("the site is live now at port 3000");
 });
