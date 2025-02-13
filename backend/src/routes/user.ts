@@ -2,18 +2,19 @@ import express, { Request, Response } from "express";
 import * as z from "zod";
 import jwt from "jsonwebtoken";
 import { Account, User } from "../lib/schema";
-import { jwt_secret } from "../config.js";
+import { jwt_secret } from "../config";
 import { authCheck } from "../middleware";
 import { AuthenticatedRequest } from "../types";
+import bcrypt from "bcryptjs";
 
 export const router = express.Router();
 router.use(express.json());
 
 const UserSignupZodValidationSchema = z.object({
-  email: z.string().email().toLowerCase().min(5).max(20),
+  email: z.string().email().toLowerCase().min(5).max(50),
   firstName: z.string().min(5).max(20),
   lastName: z.string().min(5).max(20),
-  password: z.string().min(10).max(50),
+  password: z.string().min(5).max(50),
 });
 
 type signupUserBody = z.infer<typeof UserSignupZodValidationSchema>;
@@ -47,6 +48,8 @@ router.post("/signup", async (req: Request, res: Response) => {
       token,
     });
   } catch (error) {
+    console.log(error);
+
     return res
       .status(500)
       .send({ message: "Something went wrong while signing up" });
@@ -54,10 +57,11 @@ router.post("/signup", async (req: Request, res: Response) => {
 });
 
 const UserSigninZodValidationSchema = z.object({
-  email: z.string().email().toLowerCase().min(4).max(20),
-  password: z.string().min(9).max(50),
+  email: z.string().email().toLowerCase().min(5).max(50),
+  password: z.string().min(5).max(50),
 });
 
+//NOTE: any password encryption and email verification is not done here, as this was just for practice
 type signinUserBody = z.infer<typeof UserSigninZodValidationSchema>;
 router.post(
   "/signin",
@@ -75,7 +79,6 @@ router.post(
       const token = jwt.sign({ userId }, jwt_secret);
       return res.json({ message: "User signed in successfully", token });
     }
-
     return res.status(411).json({ message: "Error while logging in" });
   },
 );
