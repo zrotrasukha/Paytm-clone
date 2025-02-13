@@ -1,4 +1,4 @@
-import express, { Response } from "express";
+import express from "express";
 import { router as userRouter } from "./user";
 import { router as accountRouter } from "./account";
 
