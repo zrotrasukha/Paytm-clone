@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { MONGO_URI } from "../config";
 
 type connectionObject = {
   isConnected?: number;
@@ -13,8 +14,9 @@ export default async function dbConnect(): Promise<void> {
   }
 
   try {
-    const db = await mongoose.connect(process.env.MONGODB_PASSSWORD || "");
+    const db = await mongoose.connect(MONGO_URI);
     connection.isConnected = db.connections[0].readyState;
+    console.log("MongoDB connection established");
   } catch (error) {
     console.log("Error occured connetion mongoDB", error);
     process.exit(1);
