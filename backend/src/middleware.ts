@@ -1,6 +1,6 @@
 import { JsonWebTokenError } from "jsonwebtoken";
 import jwt from "jsonwebtoken";
-import { jwt_secret } from "./config.js";
+import { jwt_secret } from "./config";
 import { NextFunction, Response } from "express";
 import { AuthenticatedRequest } from "./types.js";
 
@@ -17,7 +17,7 @@ export const authCheck = async (
   const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(token, jwt_secret!) as { userId: string };
+    const decoded = jwt.verify(token, jwt_secret!);
     if (typeof decoded !== "string" && "userId" in decoded) {
       req.userId = decoded.userId;
       next();
