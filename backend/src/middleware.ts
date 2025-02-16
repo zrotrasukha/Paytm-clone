@@ -1,27 +1,29 @@
-import { JsonWebTokenError } from "jsonwebtoken";
+import { JsonWebTokenError, JwtPayload } from "jsonwebtoken";
 import jwt from "jsonwebtoken";
 import { jwt_secret } from "./config";
 import { NextFunction, Response } from "express";
 import { AuthenticatedRequest } from "./types.js";
+import cookie from "cookie-parser";
 
 export const authCheck = async (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction,
 ) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).send({ error: "No token provided, please signup" });
+  if (!jwt_secret) throw new Error("JWT is missing in config");
+
+  const token = req.cookies.token;
+  if (!token) {
+    return res.status(401).json({ message: "No token provided" });
   }
 
-  const token = authHeader.split(" ")[1];
-
   try {
-    const decoded = jwt.verify(token, jwt_secret!);
-    if (typeof decoded !== "string" && "userId" in decoded) {
-      req.userId = decoded.userId;
-      next();
+    const decoded = jwt.verify(token, jwt_secret) as JwtPayload;
+    if (!decoded || typeof decoded !== "object" || !decoded.userId) {
+      return res.status(401).json({ message: "Invalid token payload" });
     }
+    req.userId = decoded.userId;
+    next();
   } catch (error) {
     if (error instanceof JsonWebTokenError) {
       return res.status(401).json({ message: "Invalid token", error });
