@@ -11,8 +11,8 @@ import { Toaster } from "react-hot-toast";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
+    <Toaster />
     <BrowserRouter>
-      <Toaster/>
       <Routes>
         <Route index path="/" element={<App />} />
         <Route path="/signin" element={<SigninPage />} />
