@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 import { jwt_secret } from "./config";
 import { NextFunction, Response } from "express";
 import { AuthenticatedRequest } from "./types.js";
-import cookie from "cookie-parser";
 
 export const authCheck = async (
   req: AuthenticatedRequest,
