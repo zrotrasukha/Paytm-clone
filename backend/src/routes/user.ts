@@ -12,8 +12,8 @@ router.use(express.json());
 
 const UserSignupZodValidationSchema = z.object({
   email: z.string().email().toLowerCase().min(5).max(50),
-  firstName: z.string().min(5).max(20),
-  lastName: z.string().min(5).max(20),
+  firstName: z.string().min(2).max(20),
+  lastName: z.string().min(2).max(20),
   password: z.string().min(5).max(50),
 });
 
@@ -61,7 +61,11 @@ router.post("/signup", async (req: Request, res: Response) => {
       return res.status(500).send({ error: "Error while saving account" });
     }
 
-    res.cookie("token", token, { httpOnly: true, secure: true });
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
 
     return res
       .status(200)
@@ -79,7 +83,6 @@ const UserSigninZodValidationSchema = z.object({
   password: z.string().min(5).max(50),
 });
 
-//NOTE: any password encryption and email verification is not done here, as this was just for practice
 type signinUserBody = z.infer<typeof UserSigninZodValidationSchema>;
 router.post("/signin", authCheck, async (req: Request, res: Response) => {
   try {
@@ -102,8 +105,14 @@ router.post("/signin", authCheck, async (req: Request, res: Response) => {
           .status(200)
           .send({ message: "User signed in successfully", token });
       }
+      return res.status(401).send({ error: "Incorrect email or password" });
     }
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .send({ message: "Something went wrong while signing in" });
+  }
 });
 const UserUpdateZodValidationSchema = z.object({
   password: z.string().min(10).max(50),
@@ -129,7 +138,27 @@ router.put("/", authCheck, async (req: AuthenticatedRequest, res: Response) => {
   }
 });
 
-router.get("/bulk", async (req: Request, res: Response) => {
+router.get(
+  "/getuser",
+  authCheck,
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const user = await User.findById(req.userId);
+      if (!user) {
+        console.log("user not found");
+        return res.status(404).send({ error: "User not found" });
+      }
+      console.log(user);
+
+      return res.status(200).json({ message: "User found", user });
+    } catch (error) {
+      console.log("Error fetching username: ", error);
+      return res.status(500).send({ error: "Error while fetching user" });
+    }
+  },
+);
+
+router.get("/bulk", authCheck, async (req: Request, res: Response) => {
   try {
     const searchedUsername = req.query.filter || "";
     const users = await User.find({
