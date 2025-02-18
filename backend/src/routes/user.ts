@@ -84,7 +84,7 @@ const UserSigninZodValidationSchema = z.object({
 });
 
 type signinUserBody = z.infer<typeof UserSigninZodValidationSchema>;
-router.post("/signin", authCheck, async (req: Request, res: Response) => {
+router.post("/signin", async (req: Request, res: Response) => {
   try {
     const signinBody: signinUserBody = req.body;
     const parsed = UserSigninZodValidationSchema.safeParse(signinBody);
