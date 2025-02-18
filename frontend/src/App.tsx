@@ -1,35 +1,58 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Toaster } from "react-hot-toast";
+import { ContextProvider } from "./context/context";
+import { BrowserRouter, Route, Routes } from "react-router";
+import { SignupPage } from "./pages/signupPage";
+import SigninPage from "./pages/signinPage";
+import DashboardPage from "./pages/dashboardPage";
+import Sendpage from "./pages/sendPage";
+import HomePage from "./pages/homePage";
+import { useState } from "react";
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordToggle, setPasswordToggle] = useState(true);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <ContextProvider
+      value={{
+        firstName,
+        setFirstName,
+        lastName,
+        setLastName,
+        email,
+        setEmail,
+        password,
+        setPassword,
+        passwordToggle,
+        setPasswordToggle,
+      }}
+    >
+      <div className="font-bold uppercase px-2"></div>
+      <Toaster
+        toastOptions={{
+          style: {
+            fontWeight: "bold",
+            minHeight: "100px",
+            width: "300px",
+            fontSize: "15px",
+            margin: "10px",
+            paddingInline: "22px",
+          },
+          position: "bottom-right",
+        }}
+      />
+      <BrowserRouter>
+        <Routes>
+          <Route index path="/" element={<HomePage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/signin" element={<SigninPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/send" element={<Sendpage />} />
+        </Routes>
+      </BrowserRouter>
+    </ContextProvider>
+  );
 }
-
-export default App
