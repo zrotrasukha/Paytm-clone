@@ -1,10 +1,10 @@
 type props = {
-  subheading: string;
   className?: string;
+  children?: React.ReactNode;
 };
 
-const Subheading = ({ subheading, className }: props) => {
-  return <div className={`text-black text-sm ${className}`}>{subheading}</div>;
+const Subheading = ({  className, children }: props) => {
+  return <div className={`text-black text-sm ${className}`}>{children}</div>;
 };
 
 export default Subheading;

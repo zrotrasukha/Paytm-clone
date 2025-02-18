@@ -1,15 +1,15 @@
-import { PasswordContextType, usePasswordContext } from "../context/context.ts";
+import { AppContextType, useAppContext } from "../context/context.ts";
 
 import { FaEye as EyeIcon } from "react-icons/fa6";
 import { FaRegEyeSlash as ClosedEyeIcon } from "react-icons/fa";
 
 export const PasswordInput = () => {
-const {
+  const {
     password,
     passwordToggle,
     setPassword,
     setPasswordToggle,
-  }: PasswordContextType = usePasswordContext();
+  }: AppContextType = useAppContext();
   return (
     <div className="mb-5">
       <label className="text-md font-bold">Password</label>
