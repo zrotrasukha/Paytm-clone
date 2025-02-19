@@ -188,7 +188,7 @@ router.get("/getallusers", authCheck, async (req: Request, res: Response) => {
     const allUsersResponse = await User.find();
     if (!allUsersResponse) {
       return res.status(404).send({ error: "Users not found" });
-    } 
+    }
     return res.status(200).json({
       users: allUsersResponse.map((user) => ({
         username: user.email,
@@ -196,8 +196,17 @@ router.get("/getallusers", authCheck, async (req: Request, res: Response) => {
         lastName: user.lastName,
         _id: user._id,
       }))
-    }); 
+    });
   } catch (error) {
-    return res.status(500).send({ error: "Error while fetching users" }); 
+    return res.status(500).send({ error: "Error while fetching users" });
   }
-}) 
+})
+
+router.post('/logout', authCheck, async (req: Request, res: Response) => {
+  try {
+    res.clearCookie("token");
+    return res.status(200).send({ message: "Logged out successfully" });
+  } catch (error) {
+    return res.status(500).send({ error: "Error while logging out" });
+  }
+})
