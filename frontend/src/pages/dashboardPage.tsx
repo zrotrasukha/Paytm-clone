@@ -45,6 +45,19 @@ export default function DashboardPage() {
       return { error: "Error while fetching balance" };
     }
   }
+
+  const getAllUsers = async () => {
+    try {
+      const allUsersResponse = await axios.get("http://localhost:3000/api/v1/user/getallusers", { withCredentials: true });
+      if (!allUsersResponse) {
+        throw new Error;
+      }
+      return allUsersResponse;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   useEffect(() => {
     getUser();
     getBalance();
@@ -52,8 +65,16 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!debouncedSearchQuery) {
-      console.log("🔍 Search query empty, clearing results");
-      setSearchResults([]);
+      const response = async () => {
+        const response = await getAllUsers();
+        if (!response || response?.status !== 200) {
+          setSearchResults([]);
+          return;
+        }
+        setSearchResults(response.data.users);
+        return;
+      };
+      response();
       return;
     }
 
@@ -115,9 +136,17 @@ export default function DashboardPage() {
               Search
             </button>
           </div>
-          {searchResults.map((user, index) => {
-            return <SearchedUserBox key={index} username={user.firstName} />
-          })}
+          <div className="mt-10">
+
+            {searchResults.map((user, index) => {
+              return <SearchedUserBox
+                className="mt-2"
+                key={index}
+                username={user.firstName + " " + user.lastName}
+
+              />
+            })}
+          </div>
         </div>
       </div>
     </div>
