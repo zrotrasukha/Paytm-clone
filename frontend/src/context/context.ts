@@ -11,6 +11,10 @@ export type AppContextType = {
   setLastName: React.Dispatch<React.SetStateAction<string>>;
   email: string;
   setEmail: React.Dispatch<React.SetStateAction<string>>;
+  username: string;
+  setUsername: React.Dispatch<React.SetStateAction<string>>;
+  balance: string;
+  setBalance: React.Dispatch<React.SetStateAction<string>>;
 };
 
 const AppContext = createContext<AppContextType | null>(null);
