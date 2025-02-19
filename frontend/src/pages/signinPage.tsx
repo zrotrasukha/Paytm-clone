@@ -10,7 +10,6 @@ import Subheading from "../components/subheading";
 
 export default function SigninPage() {
   const { email, setEmail, password } = useAppContext();
-
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
