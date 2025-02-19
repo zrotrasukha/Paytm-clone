@@ -180,6 +180,24 @@ router.get("/bulk", authCheck, async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.log(error);
-    return res.status(500).send({ error: "Error while fetching user" });
   }
 });
+
+router.get("/getallusers", authCheck, async (req: Request, res: Response) => {
+  try {
+    const allUsersResponse = await User.find();
+    if (!allUsersResponse) {
+      return res.status(404).send({ error: "Users not found" });
+    } 
+    return res.status(200).json({
+      users: allUsersResponse.map((user) => ({
+        username: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        _id: user._id,
+      }))
+    }); 
+  } catch (error) {
+    return res.status(500).send({ error: "Error while fetching users" }); 
+  }
+}) 
