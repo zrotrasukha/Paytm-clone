@@ -7,6 +7,7 @@ import { PasswordInput } from "../components/passwordInput";
 import Button from "../components/button";
 import axios from "axios";
 import Subheading from "../components/subheading";
+import { useEffect, useRef } from "react";
 
 export default function SigninPage() {
   const { email, setEmail, password } = useAppContext();
@@ -37,6 +38,26 @@ export default function SigninPage() {
       toast.error("Something went wrong!");
     }
   };
+  const hasToastFired = useRef(false);
+  useEffect(() => {
+    const getUser = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:3000/api/v1/user/getuser", {withCredentials: true})
+        if (response.status === 200) {
+          console.log("✅ User already logged in, redirecting...");
+          navigate("/dashboard");
+          if(!hasToastFired.current) {
+            hasToastFired.current = true;
+            toast("Welcom back!");
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    getUser();
+  }, [])
 
   return (
     <div className="bg-zinc-900 text-white flex flex-col justify-center items-center h-screen w-screen">
@@ -54,7 +75,7 @@ export default function SigninPage() {
           />
 
           <PasswordInput />
-          <Button type="submit">Submit</Button>
+          <Button type="submit" classname="w-full text-white">Submit</Button>
           <Subheading />
         </form>
 
