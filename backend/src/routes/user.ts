@@ -160,19 +160,19 @@ router.get(
 
 router.get("/bulk", authCheck, async (req: Request, res: Response) => {
   try {
-    const searchedUsername = req.query.filter || "";
+    const searchedUsername = req.query.search || "";
     const users = await User.find({
       $or: [
-        { firstName: { $regex: searchedUsername } },
-        { lastName: { $regex: searchedUsername } },
+        { firstName: { $regex: searchedUsername, $options: "i" } },
+        { lastName: { $regex: searchedUsername, $options: "i" } },
       ],
     });
     if (!users) {
-      return;
+      return res.status(404).send({ error: "Users not found" });
     }
-    return res.json({
-      user: users.map((user) => ({
-        usernae: user.email,
+    return res.status(200).json({
+      users: users.map((user) => ({
+        username: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
         _id: user._id,
