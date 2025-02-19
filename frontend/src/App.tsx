@@ -14,7 +14,8 @@ export default function App() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordToggle, setPasswordToggle] = useState(true);
-
+  const [username, setUsername] = useState("");
+  const [balance, setBalance] = useState("");
   return (
     <ContextProvider
       value={{
@@ -28,6 +29,10 @@ export default function App() {
         setPassword,
         passwordToggle,
         setPasswordToggle,
+        username, 
+        setUsername, 
+        balance, 
+        setBalance
       }}
     >
       <div className="font-bold uppercase px-2"></div>
