@@ -8,7 +8,7 @@ type props = {
 export default function Button({ classname, children, type, onClick}: props) {
   return (
     <button
-      className={`${classname} w-full bg-black h-10 rounded-md text-white font-bold text-md `} type={type} onClick={onClick}
+      className={` w-fit px-2 bg-black h-10 rounded-md font-bold text-md ${classname} `} type={type} onClick={onClick}
 
     >
       {children}

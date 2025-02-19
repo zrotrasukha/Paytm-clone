@@ -11,7 +11,7 @@ export default function Headings({
   return (
     <>
       <Heading heading={heading} />
-      <Subheading subheading={subheading} className="p-2" />
+      <Subheading children={subheading} className="p-2" />
     </>
   );
 }
