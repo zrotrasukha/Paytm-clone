@@ -6,7 +6,7 @@ export default function DashboardHeader() {
   return (
     <section className="flex justify-between px-4 items-center w-full h-15 bg-zinc-800 text-white border-b-2 border-b-neutral-300">
       <div className="font-extrabold text-xl">Payments App</div>
-      <div className="flex">
+      <div className="flex justify-center items-center gap-3">
         <h3>Hello {username}!</h3>
         <ProfilePicture name={username}/>
       </div>
