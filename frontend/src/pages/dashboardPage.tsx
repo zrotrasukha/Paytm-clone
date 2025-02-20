@@ -11,7 +11,6 @@ export default function DashboardPage() {
   const { setUsername, balance, setBalance } = useAppContext();
   const [searchResults, setSearchResults] = useState<usersResponseType[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const navigate = useNavigate();
 
@@ -34,17 +33,21 @@ export default function DashboardPage() {
     }
   };
 
-  const getBalance = async () => {
-    try {
-      const balanceResponse = await axios.get(
-        "http://localhost:3000/api/v1/account/balance",
-        { withCredentials: true });
-      setBalance(balanceResponse.data.balance);
-      return balanceResponse.data.balance;
-    } catch (error) {
-      return { error: "Error while fetching balance" };
+  useEffect(() => {
+    const getBalance = async () => {
+      try {
+        const balanceResponse = await axios.get(
+          "http://localhost:3000/api/v1/account/balance",
+          { withCredentials: true });
+        setBalance(balanceResponse.data.balance);
+        return balanceResponse.data.balance;
+      } catch (error) {
+        return { error: "Error while fetching balance" };
+      }
     }
-  }
+    
+    getBalance();
+  }, [balance])
 
   const getAllUsers = async () => {
     try {
@@ -60,7 +63,6 @@ export default function DashboardPage() {
 
   useEffect(() => {
     getUser();
-    getBalance();
   }, []);
 
   useEffect(() => {
@@ -79,7 +81,6 @@ export default function DashboardPage() {
     }
 
     const onSearch = async () => {
-      setIsSearching(true);
       try {
         const response = await getUserBulk();
 
@@ -90,7 +91,6 @@ export default function DashboardPage() {
       } catch (error) {
         console.log(error);
       }
-      setIsSearching(false);
     }
     if (debouncedSearchQuery) {
       onSearch();
@@ -121,31 +121,25 @@ export default function DashboardPage() {
         </div>
         <div className="flex-col  pt-5 text-white">
           <h2 className="text-xl font-bold">Users</h2>
-          <div className=" flex p-2 focus:outline-none border-2 border-neutral-500 text-sm  w-full mt-2 rounded-sm">
+          <div className=" flex p-2 bg-neutral-800  focus:outline-none border-2 border-neutral-500 text-sm  w-full mt-2 rounded-sm">
             <input
               type="search" placeholder="Search User"
-              className="focus:outline-none h-10  w-full"
+              className="focus:outline-none h-6 w-full"
               autoFocus
               onChange={(e) => { setSearchQuery(e.target.value) }}
               value={searchQuery}
             />
-            <button
-              className="h-10 font-semibold w-24 rounded-sm bg-white  hover:bg-neutral-200 text-black"
-              disabled={isSearching}
-            >
-              Search
-            </button>
           </div>
           <div className="mt-10">
 
-            {searchResults.map((user, index) => {
-              return <SearchedUserBox
+            {searchResults.map((user, index) => (
+              <SearchedUserBox
                 className="mt-2"
                 key={index}
-                username={user.firstName + " " + user.lastName}
-
+                username={`${user.firstName} ${user.lastName}`}
+                to={user?._id}
               />
-            })}
+            ))}
           </div>
         </div>
       </div>
