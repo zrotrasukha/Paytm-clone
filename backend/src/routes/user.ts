@@ -24,7 +24,7 @@ router.post("/signup", async (req: Request, res: Response) => {
     const signupBody: signupUserBody = req.body;
     const parsed = UserSignupZodValidationSchema.safeParse(signupBody);
     if (!parsed.success) {
-      return res.status(400).send({ error: "Incorrect inputs" });
+      return res.status(400).json({ error: "Incorrect inputs" });
     }
     const { email, password, firstName, lastName } = parsed.data;
 
@@ -32,7 +32,7 @@ router.post("/signup", async (req: Request, res: Response) => {
     if (existingUser) {
       return res
         .status(401)
-        .send({ error: "Email already taken / Incorrect inputs" });
+        .json({ error: "Email already taken / Incorrect inputs" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -45,7 +45,7 @@ router.post("/signup", async (req: Request, res: Response) => {
     const savedUser = await newUser.save();
 
     if (!savedUser) {
-      return res.status(500).send({ error: "Error while saving user" });
+      return res.status(500).json({ error: "Error while saving user" });
     }
 
     const token = jwt.sign({ userId: savedUser._id }, jwt_secret, {
@@ -58,7 +58,7 @@ router.post("/signup", async (req: Request, res: Response) => {
     });
     const savedAccount = await userBalanceAccount.save();
     if (!savedAccount) {
-      return res.status(500).send({ error: "Error while saving account" });
+      return res.status(500).json({ error: "Error while saving account" });
     }
 
     res.cookie("token", token, {
@@ -69,12 +69,12 @@ router.post("/signup", async (req: Request, res: Response) => {
 
     return res
       .status(200)
-      .send({ message: "User created successfully", token });
+      .json({ message: "User created successfully", token });
   } catch (error) {
     console.log(error);
     return res
       .status(500)
-      .send({ message: "Something went wrong while signing up" });
+      .json({ message: "Something went wrong while signing up" });
   }
 });
 
@@ -89,7 +89,7 @@ router.post("/signin", async (req: Request, res: Response) => {
     const signinBody: signinUserBody = req.body;
     const parsed = UserSigninZodValidationSchema.safeParse(signinBody);
     if (!parsed.success) {
-      return res.status(400).send({ error: "Incorrect inputs" });
+      return res.status(400).json({ error: "Incorrect inputs" });
     }
     const { email, password } = parsed.data;
     const existingUser = await User.findOne({ email });
@@ -103,15 +103,15 @@ router.post("/signin", async (req: Request, res: Response) => {
         res.cookie("token", token, { httpOnly: true, secure: true });
         return res
           .status(200)
-          .send({ message: "User signed in successfully", token });
+          .json({ message: "User signed in successfully", token });
       }
-      return res.status(401).send({ error: "Incorrect email or password" });
+      return res.status(401).json({ error: "Incorrect email or password" });
     }
   } catch (error) {
     console.log(error);
     return res
       .status(500)
-      .send({ message: "Something went wrong while signing in" });
+      .json({ message: "Something went wrong while signing in" });
   }
 });
 const UserUpdateZodValidationSchema = z.object({
@@ -127,14 +127,14 @@ router.put("/", authCheck, async (req: AuthenticatedRequest, res: Response) => {
     const updateBody: updateBody = req.body;
 
     if (!UserUpdateZodValidationSchema.safeParse(updateBody).success) {
-      return res.status(400).send({ error: "Incorrect inputs" });
+      return res.status(400).json({ error: "Incorrect inputs" });
     }
 
     await User.updateOne({ userId: req.userId }, updateBody);
-    return res.status(200).send({ message: "User updated successfully" });
+    return res.status(200).json({ message: "User updated successfully" });
   } catch (err) {
     console.log(err);
-    return res.status(500).send({ error: "Error while updating user" });
+    return res.status(500).json({ error: "Error while updating user" });
   }
 });
 
@@ -146,17 +146,37 @@ router.get(
       const user = await User.findById(req.userId);
       if (!user) {
         console.log("user not found");
-        return res.status(404).send({ error: "User not found" });
+        return res.status(404).json({ error: "User not found" });
       }
       console.log(user);
 
       return res.status(200).json({ message: "User found", user });
     } catch (error) {
       console.log("Error fetching username: ", error);
-      return res.status(500).send({ error: "Error while fetching user" });
+      return res.status(500).json({ error: "Error while fetching user" });
     }
   },
 );
+
+router.get(
+  "/getuser/:id",
+  authCheck,
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const user = await User.findById(req.params.id);
+      if (!user) {
+        console.log("user not found");
+        return res.status(404).json({ error: "User not found" });
+      }
+      console.log(user);
+
+      return res.status(200).json({ message: "User found", user });
+    } catch (error) {
+      console.log("Error fetching username: ", error);
+      return res.status(500).json({ error: "Error while fetching user" });
+    }
+  }
+)
 
 router.get("/bulk", authCheck, async (req: Request, res: Response) => {
   try {
@@ -168,7 +188,7 @@ router.get("/bulk", authCheck, async (req: Request, res: Response) => {
       ],
     });
     if (!users) {
-      return res.status(404).send({ error: "Users not found" });
+      return res.status(404).json({ error: "Users not found" });
     }
     return res.status(200).json({
       users: users.map((user) => ({
@@ -187,26 +207,32 @@ router.get("/getallusers", authCheck, async (req: Request, res: Response) => {
   try {
     const allUsersResponse = await User.find();
     if (!allUsersResponse) {
-      return res.status(404).send({ error: "Users not found" });
+      return res.status(404).json({ error: "Users not found" });
     }
     return res.status(200).json({
-      users: allUsersResponse.map((user) => ({
-        username: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        _id: user._id,
-      }))
+      users: allUsersResponse
+        .filter((user, index) => index < 10)
+        .map((user) => ({
+          username: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          _id: user._id,
+        }))
     });
   } catch (error) {
-    return res.status(500).send({ error: "Error while fetching users" });
+    return res.status(500).json({ error: "Error while fetching users" });
   }
 })
 
 router.post('/logout', authCheck, async (req: Request, res: Response) => {
   try {
-    res.clearCookie("token");
-    return res.status(200).send({ message: "Logged out successfully" });
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+    return res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
-    return res.status(500).send({ error: "Error while logging out" });
+    return res.status(500).json({ error: "Error while logging out" });
   }
 })
