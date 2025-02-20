@@ -8,6 +8,7 @@ import InputBox from "../components/input";
 import Headings from "../components/header";
 import Subheading from "../components/subheading";
 import { Link } from "react-router";
+import Card from "../components/card";
 
 export const SignupPage = () => {
   const {
@@ -38,48 +39,50 @@ export const SignupPage = () => {
         toast.success("User created successfully");
         navigate("/signin");
       }
+
       return;
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      toast.error("User already exists");
+      toast.error("Something went wrong while signing up");
+      return;
     }
   };
+
+  const isFormFilled = firstName && lastName && email && password ? false : true;
   return (
-    <div className="bg-zinc-900 text-white flex flex-col justify-center items-center h-screen w-screen">
-      <div className="w-96 flex flex-col justify-center items-center rounded-2xl h-[700px] bg-white text-black py-10 px-7">
-        <Headings
-          heading="Sign Up"
-          subheading="Create an account to continue"
+    <Card classname="h-fit">
+      <Headings
+        heading="Sign Up"
+        subheading="Create an account to continue"
+      />
+      <form className="mt-3 flex flex-col w-full" onSubmit={handleSubmit}>
+        <InputBox
+          label="First Name"
+          value={firstName}
+          placeholder="John"
+          onChange={(e) => setFirstName(e.target.value)}
         />
-        <form className="mt-3 flex flex-col w-full" onSubmit={handleSubmit}>
-          <InputBox
-            label="First Name"
-            value={firstName}
-            placeholder="John"
-            onChange={(e) => setFirstName(e.target.value)}
-          />
-          <InputBox
-            label="Last Name"
-            placeholder="Doe"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-          />
-          <InputBox
-            label="Email"
-            placeholder="johnDoe@email.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <PasswordInput />
-          <Button type="submit">Submit</Button>
-        </form>
-        <Subheading className="mt-3">
-          Already have an account?
-          <Link to={"/signin"} className="font-bold ml-1">
-            Sign in
-          </Link>
-        </Subheading>
-      </div>
-    </div>
+        <InputBox
+          label="Last Name"
+          placeholder="Doe"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+        />
+        <InputBox
+          label="Email"
+          placeholder="johnDoe@email.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <PasswordInput />
+        <Button disabled={isFormFilled} type="submit" classname="w-full text-white">Submit</Button>
+      </form>
+      <Subheading className="mt-3">
+        Already have an account?
+        <Link to={"/signin"} className="font-bold ml-1">
+          Sign in
+        </Link>
+      </Subheading>
+    </Card>
   );
 };
