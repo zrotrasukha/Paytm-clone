@@ -25,13 +25,14 @@ router.get(
 );
 
 router.post(
-  "/transfer",
+  "/transfer/:to",
   authCheck,
   async (req: AuthenticatedRequest, res: Response) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-      const { to, amount }: { to: string; amount: number } = req.body;
+      const { amount }: { amount: number } = req.body;
+      const to = req.params.to;
       const senderAccount = await Account.findOne({
         userId: req.userId,
       }).session(session);
@@ -59,7 +60,7 @@ router.post(
         { $inc: { balance: amount } },
       ).session(session);
 
-      res.status(200).json({ message: "Transfer successful" });
+      return res.status(200).json({ message: "Transfer successful" });
 
       await session.commitTransaction();
     } catch (error) {
