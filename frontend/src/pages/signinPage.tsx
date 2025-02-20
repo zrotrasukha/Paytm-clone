@@ -8,6 +8,7 @@ import Button from "../components/button";
 import axios from "axios";
 import Subheading from "../components/subheading";
 import { useEffect, useRef } from "react";
+import Card from "../components/card";
 
 export default function SigninPage() {
   const { email, setEmail, password } = useAppContext();
@@ -24,18 +25,19 @@ export default function SigninPage() {
         },
         { withCredentials: true },
       );
-      if (response.status === 200) {
-        toast.success(`${email} signed in successfully!`);
-        navigate("/dashboard");
+      if (response.status !== 200) {
+        throw new Error;
       }
-      return;
+      toast.success(`${email} signed in successfully!`);
+      navigate("/dashboard");
+      
     } catch (error) {
+      toast.error("Something went wrong!");
       console.error("AXIOS ERROR:", error);
       if (axios.isAxiosError(error)) {
         console.error("Response Data:", error.response?.data);
         console.error("Status Code:", error.response?.status);
       }
-      toast.error("Something went wrong!");
     }
   };
   const hasToastFired = useRef(false);
@@ -49,7 +51,6 @@ export default function SigninPage() {
           navigate("/dashboard");
           if(!hasToastFired.current) {
             hasToastFired.current = true;
-            toast("Welcom back!");
           }
         }
       } catch (error) {
@@ -59,9 +60,9 @@ export default function SigninPage() {
     getUser();
   }, [])
 
+  const isFormFilled = email && password ? false : true;
   return (
-    <div className="bg-zinc-900 text-white flex flex-col justify-center items-center h-screen w-screen">
-      <div className="w-96 flex flex-col justify-center items-center rounded-2xl h-[460px] bg-white text-black py-10 px-7">
+    <Card>
         <Headings
           heading="Sign In"
           subheading="Enter your details to continue"
@@ -75,7 +76,7 @@ export default function SigninPage() {
           />
 
           <PasswordInput />
-          <Button type="submit" classname="w-full text-white">Submit</Button>
+          <Button type="submit" disabled={isFormFilled} classname="w-full text-white">Submit</Button>
           <Subheading />
         </form>
 
@@ -85,7 +86,6 @@ export default function SigninPage() {
             Sign-up
           </Link>
         </Subheading>
-      </div>
-    </div>
+    </Card>
   );
 }
