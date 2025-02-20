@@ -7,6 +7,7 @@ import DashboardPage from "./pages/dashboardPage";
 import Sendpage from "./pages/sendPage";
 import HomePage from "./pages/homePage";
 import { useState } from "react";
+import Transfer from "./pages/sendMoney";
 
 export default function App() {
   const [firstName, setFirstName] = useState("");
@@ -55,7 +56,7 @@ export default function App() {
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/signin" element={<SigninPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/send" element={<Sendpage />} />
+          <Route path="/transfer/:to" element={<Transfer/>} />
         </Routes>
       </BrowserRouter>
     </ContextProvider>
