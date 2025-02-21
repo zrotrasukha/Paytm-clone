@@ -48,7 +48,7 @@ router.post(
       if (!receiverAccount) {
         await session.abortTransaction();
         return res.status(404).json({ message: "Invalid Account" });
-      }
+      } 
 
       await Account.updateOne(
         { userId: req.userId },
@@ -60,9 +60,9 @@ router.post(
         { $inc: { balance: amount } },
       ).session(session);
 
-      return res.status(200).json({ message: "Transfer successful" });
-
+      
       await session.commitTransaction();
+      return res.status(200).json({ message: "Transfer successful" });
     } catch (error) {
       await session.abortTransaction();
       return res.status(500).send("Internal server error");
