@@ -11,7 +11,7 @@ export default function Headings({
   className?: string;
 }) {
   return (
-  <div className={`flex flex-col ${className}`}>
+  <div className={`flex flex-col justify-center items-center ${className}`}>
 
       <Heading heading={heading} />
       <Subheading children={subheading} className="p-2" />
