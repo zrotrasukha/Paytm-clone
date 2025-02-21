@@ -15,6 +15,9 @@ export default function TransferPage() {
   const { to } = useParams();
   const navigate = useNavigate();
 
+       
+   
+
   const handleTransferSubmit = async (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault()
     try {
@@ -70,7 +73,7 @@ export default function TransferPage() {
         {user && (
           <div className='flex items-center mb-4'>
             <ProfilePicture name={user.firstName} className='bg-green-500 text-white font-extrabold' />
-            <p className='ml-2'>{user.firstName} {user.lastName}</p>
+            <p className='ml-2'>{user.firstName[0].toUpperCase () + user.firstName.slice(1)} {user.lastName[0].toUpperCase() + user.lastName.slice(1)}</p>
           </div>
         )}
         <InputBox
